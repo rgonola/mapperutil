@@ -1,0 +1,75 @@
+<template>
+
+		<div class="spinner">
+        <template if:true={isLoading}>
+             <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+             </lightning-spinner>
+        </template>
+    </div>
+		<lightning-card>
+				<h3 slot="title">
+						<lightning-icon icon-name="standard:timesheet" alternative-text="Event" size="small"></lightning-icon>
+						&nbsp;Field Mapping for below objects
+				</h3>
+
+				<lightning-layout multiple-rows>
+
+						<lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6"
+																	 padding="around-small">
+								<lightning-combobox
+																		name="Source Object"
+																		label="Source Object"
+																		value={sourceObject}
+																		placeholder="Select a object"
+																		options={sourceObjects}
+																		onchange={sourceObjectChange} 
+																		required
+																		message-when-value-missing = "Please select source object"
+																		></lightning-combobox>
+						</lightning-layout-item>
+
+						<lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6"
+																	 padding="around-small">
+								<lightning-combobox
+																		name="Destination Object"
+																		label="Destination Object"
+																		value={destinationObject}
+																		placeholder="Select a object"
+																		options={destinationObjects}
+																		onchange={destinationObjectChange}
+																		disabled={sourceObjReq} 
+																		required
+																		message-when-value-missing = "Please select destination object"></lightning-combobox>
+						</lightning-layout-item>
+
+
+
+				</lightning-layout>
+
+				</br>
+				</br>
+
+				<template if:true={showMapping}>
+						<template for:each={responseList} for:item="item" for:index="index">
+								<div key={item.id} style="float:center;">
+									 <c-field-Mapper-Util key={item.id} item-list={responseList} index={item.id} 
+																				source-options={_sourceOptions} destination-options={_destinationOptions} source-value={item.sourceValue} destination-value ={item.destinationValue}
+																				onmappingresults={handlemappingchange} ></c-field-Mapper-Util>
+								</div>
+						</template>
+
+				</template>
+				</br>
+				</br>
+
+		<lightning-layout>
+				<div class="slds-align_absolute-center">
+						<lightning-button variant="success" onclick={handleSubmit} name="submit" label="Submit">
+						</lightning-button>
+						<lightning-button variant="success" onclick={handleCancel} name="Cancel" label="Cancel">
+						</lightning-button>
+				</div>
+		</lightning-layout>
+
+		</lightning-card>
+</template>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>List</customSettingsType>
+    <enableFeeds>false</enableFeeds>
+    <fields>
+        <fullName>Destination_Field__c</fullName>
+        <externalId>false</externalId>
+        <label>Destination Field</label>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Destination_Object__c</fullName>
+        <externalId>false</externalId>
+        <label>Destination Object</label>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Mapping_Name__c</fullName>
+        <externalId>false</externalId>
+        <label>Mapping Name</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Source_Field__c</fullName>
+        <externalId>false</externalId>
+        <label>Source Field</label>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Source_Object__c</fullName>
+        <externalId>false</externalId>
+        <label>Source Object</label>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <label>Field Mapper</label>
+    <visibility>Public</visibility>
+</CustomObject>

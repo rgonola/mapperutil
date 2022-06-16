@@ -1,0 +1,52 @@
+<template>
+
+		<lightning-messages> </lightning-messages>
+		<lightning-layout multiple-rows>
+				<lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="2"
+															 padding="around-small">
+						
+				</lightning-layout-item>
+				<lightning-layout-item size="12" small-device-size="3" medium-device-size="2" large-device-size="1"
+															 padding="around-small">
+						<lightning-input type="number" label="Sl No" value={index} disabled></lightning-input>
+				</lightning-layout-item>
+				
+				<lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="2"
+															 padding="around-small">
+						<lightning-combobox
+																name="Source Field"
+																label="Source Field"
+																value={sourceValue}
+																placeholder="Select a field"
+																options={sourceOptions}
+																onchange={handlesourceChange} ></lightning-combobox>
+				</lightning-layout-item>
+
+				<lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="2"
+															 padding="around-small">
+						<lightning-combobox
+																name="Destination Field"
+																label="Destination Field"
+																value={destinationValue}
+																placeholder="Select a field"
+																options={destinationOptions}
+																onchange={handledestinationChange} ></lightning-combobox>
+				</lightning-layout-item>
+
+				<lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="2"
+															 padding="around-small">
+						<div class="slds-p-top_medium">
+								
+								<lightning-icon  icon-name="action:new" 
+																alternative-text="Add Row" size="small" title="Add Row" onclick={addRow}>
+								</lightning-icon>
+								<template if:true={isfirstrow}>		
+										<lightning-icon icon-name="action:delete" access-key={index} id={index}
+																		alternative-text="Delete Row" size="small" title="Delete Row" onclick={removeRow}>
+										</lightning-icon>
+								</template>
+						</div>
+				</lightning-layout-item>
+
+		</lightning-layout>
+</template>
