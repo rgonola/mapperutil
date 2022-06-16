@@ -1,0 +1,10 @@
+**/jsconfig.json
+package.xml
+**/.eslintrc.json
+**appMenu
+**appSwitcher
+**objectTranslations
+**profiles
+**settings
+# LWC Jest
+**/__tests__/**

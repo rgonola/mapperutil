@@ -1,0 +1,118 @@
+# Unique name for this workflow
+name: Deploy custom package xml to respective org
+
+# Definition when the workflow should run
+on: 
+    workflow_dispatch :
+    push:
+      branches: 
+       - DEV
+       - TST
+       - STG
+       - main
+      paths:
+        - 'custompackage.xml'
+            
+
+# Jobs to be executed
+jobs:
+    deploy-packagexml-to-org:
+        runs-on: ubuntu-latest
+        
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        steps:
+            # Checkout the source code
+            - name: 'Checkout source code'
+              uses: actions/checkout@v2
+              with:
+                fetch-depth: 0
+
+            - name: Read package.xml
+              id: package
+              uses: juliangruber/read-file-action@v1
+              with:
+                path: ./custompackage.xml    
+
+            # Install Salesforce CLI
+            - name: 'Install Salesforce CLI'
+              if: ${{ steps.package.outputs.content != '' }}
+              run: |
+                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+                  mkdir ~/sfdx
+                  tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
+                  echo "$HOME/sfdx/bin" >> $GITHUB_PATH
+                  ~/sfdx/bin/sfdx version
+
+            - name: 'Get test class information'
+              if: ${{ steps.package.outputs.content != '' }}
+              run: |
+                  TESTS=$(cat ./deploymentSpecificTest.txt)       
+                  echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV
+
+
+            # Store secret for DEV org
+           
+
+            - name: 'Populate auth file with SFDX_URL secret of the DEV org'
+              shell: bash
+              if: github.ref == 'refs/heads/DEV' 
+              run: |
+                  echo ${{ secrets.SFDX_TAANA_DEV}} > ./SFDX_TAANA.txt
+
+            - name: 'Populate auth file with SFDX_URL secret of the TST org'
+              shell: bash
+              if: github.ref == 'refs/heads/TST' 
+              run: |
+                  echo ${{ secrets.SFDX_TAANA_TST}} > ./SFDX_TAANA.txt
+
+            - name: 'Populate auth file with SFDX_URL secret of the STG org'
+              shell: bash
+              if: github.ref == 'refs/heads/STG' 
+              run: |
+                  echo ${{ secrets.SFDX_TAANA_STG}} > ./SFDX_TAANA.txt
+
+            - name: 'Populate auth file with SFDX_URL secret of the PROD org'
+              shell: bash
+              if: github.ref == 'refs/heads/main' 
+              run: |
+                  echo ${{ secrets.SFDX_TAANA_PROD}} > ./SFDX_TAANA.txt
+
+
+            # Authenticate to org
+            - name: 'Authenticate to DEV Org'
+              if: ${{ steps.package.outputs.content != '' }}
+              run: sfdx auth:sfdxurl:store -f ./SFDX_TAANA.txt -s -a DEV
+
+            - name: 'Deploy the changes to DEV org - run specified tests'
+              if: ${{ env.APEX_TESTS != 'all' &&  steps.package.outputs.content != '' }}
+              run: |
+                  echo ${{env.APEX_TESTS}}
+                  sfdx force:source:deploy -x custompackage.xml --testlevel RunSpecifiedTests --runtests ${{env.APEX_TESTS}} --json
+
+            # If the env variable equals all, we run all tests
+            - name: 'Deploy the changes to DEV org - run all tests'
+              if: ${{ env.APEX_TESTS == 'all' &&  steps.package.outputs.content != '' }}
+              run: |
+                  echo ${{env.APEX_TESTS}}
+                  sfdx force:source:deploy -x custompackage.xml --testlevel RunLocalTests  --json
+
+            #sfdx force:source:deploy -p force-app --testlevel RunLocalTests --json
+            - name: Read customdestructive.xml
+              id: customdestructivepackage
+              uses: juliangruber/read-file-action@v1
+              with:
+                path: ./customdestructive.xml    
+
+            - name: 'Deploy destructive changes (if any) to Integration org'
+              if: ${{ steps.customdestructivepackage.outputs.content != '' }}
+              run: sfdx force:mdapi:deploy -x customdestructive.xml --ignorewarnings 
+
+            # Authenticate to org
+            # - name: 'Authenticate to Staging Org to Staging org'
+            #   run: sfdx auth:sfdxurl:store -f ./SFDX_STAGING_URL.txt -s -a staging
+
+            # - name: 'deploy the entire branch'
+            #   run: sfdx force:source:deploy -p force-app --testlevel RunLocalTests --json
+
+            # - name: 'deploy destructive changes (if any) to Staging org'
+            #   run: sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings
